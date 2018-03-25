@@ -53,8 +53,11 @@
                  */
                 resourceCache[url] = img;
 
-                /* Once the image is actually loaded and properly cached,
-                 * call all of the onReady() callbacks we have defined.
+                /* Once, this onload event handler, is triggered by the last
+                 * successfully loaded image, the isReady() function will return true.
+                 * That's why call all of the onReady() callbacks
+                 * we have defined. (This will invoke the init() function
+                 * which  has been added in readyCallBacks array by the game's Engine.)
                  */
                 if(isReady()) {
                     readyCallbacks.forEach(function(func) { func(); });
