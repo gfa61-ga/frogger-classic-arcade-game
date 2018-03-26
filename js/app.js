@@ -31,6 +31,8 @@ Enemy.prototype.update = function(dt) {
      */
     this.x += this.velocity * dt;
 
+    /* TODO: Handle collision with the Player */
+
     // If the enemy disappears, moving completely out of the right side of the canvas,
     if (this.x >=  525) {
         // move the enemy completely out of the left side of the canvas
@@ -60,36 +62,81 @@ Enemy.prototype.randomInt = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+// The player class
 let Player = function() {
-    /* TODO */
+    // The image/sprite for our player
+    this.sprite = 'images/char-boy.png';
+
+    // The row where the player starts. In game can take an integer value between 1 and 5
+    this.row = 5;
+
+    // The column where the player stays. In game can take an integer value between 1 and 5
+    this.column = 3;
+
+    // Set initial x position of the player
+    this.x = 101 * (this.column - 1);
+
+    // Set initial y position of the player
+    this.y = 53 + (this.row - 1) * 83;
 };
 
+// Update the player's position, required method by game's Engine
 Player.prototype.update = function() {
-    /* TODO */
+    this.x = 101 * (this.column - 1);
+    this.y = 53 + (this.row - 1) * 83;
 };
 
+// Draw the player on the screen, required method by game's Engine
 Player.prototype.render = function() {
-    /* TODO */
+    // Same as the Enemy.render() method
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-Player.prototype.handleInput = function() {
-    /* TODO */
+/* Handle user input to properly move the player
+ * Parameter: moveDirection, takes a String value
+ * between 'left', 'right', 'up' and 'down'
+ */
+Player.prototype.handleInput = function(moveDirection) {
+    switch(moveDirection) {
+        /* When moving left - right
+         * check that column number is a value between 1 and 5
+         */
+        case 'left':
+            if (this.column > 1) {
+                this.column--;
+            }
+            break;
+        case 'right':
+            if (this.column < 5) {
+                this.column++;
+            }
+            break;
+        /* When moving up - down
+         * check that row number is a value between 1 and 5
+         */
+        case 'up':
+            if (this.row > 1) {
+                this.row--;
+            }
+            break;
+        case 'down':
+            if (this.row < 5) {
+                this.row++;
+            }
+    }
 };
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+// Instantiate game's objects: three enemies and one player
+// Place all enemy objects in the array called allEnemies
+// Place the player object in the variable called player
 let allEnemies = [];
 for (let index = 0; index < 3; index++) {
     allEnemies[index] = new Enemy();
 }
 let player = new Player();
 
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// Listen for key presses and send the keys to
+// Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
     let allowedKeys = {
         37: 'left',
