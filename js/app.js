@@ -111,6 +111,7 @@ Player.prototype.handleInput = function(moveDirection) {
                 this.column++;
             }
             break;
+
         /* When moving up - down
          * check that row number is a value between 1 and 5
          */
@@ -126,17 +127,19 @@ Player.prototype.handleInput = function(moveDirection) {
     }
 };
 
-// Instantiate game's objects: three enemies and one player
-// Place all enemy objects in the array called allEnemies
-// Place the player object in the variable called player
+/* Instantiate game's objects: three enemies and one player
+ * Place all enemy objects in the array called allEnemies
+ * Place the player object in the variable called player
+ */
 let allEnemies = [];
 for (let index = 0; index < 3; index++) {
     allEnemies[index] = new Enemy();
 }
 let player = new Player();
 
-// Listen for key presses and send the keys to
-// Player.handleInput() method.
+/* Listen for key presses and send the keys to
+ * Player.handleInput() method.
+ */
 document.addEventListener('keyup', function(e) {
     let allowedKeys = {
         37: 'left',
@@ -146,4 +149,48 @@ document.addEventListener('keyup', function(e) {
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
+});
+
+/* Listen for click presses and send moveDirection to
+ * Player.handleInput() method.
+ */
+document.addEventListener('click', function(e) {
+    // Shrink factor of flex-container width
+    const widthFix = 505 / ctx.canvas.offsetWidth;
+
+    // Shrink factor of flex-container height
+    const heightFix = 606 / ctx.canvas.offsetHeight;
+
+    //Fix X offset of click
+    const clickX = Math.round(e.offsetX * widthFix);
+
+    //Fix X offset of click
+    const clickY = Math.round(e.offsetY * heightFix);
+
+    let moveDirection;
+
+    /* Check if click point is inside a rectangle area
+     * Parameters: xs, ys, coordinates of rectangle's upper left corner
+     * Parameters: xe, ye, coordinates of of rectangle's lower right corner
+     * Parameters: xp, yp, coordinates of click position
+     */
+    function checkPointInRectangle(xs, ys, xe, ye, xp, yp) {
+        if (xs < xp && xp < xe && ys < yp && yp < ye) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    if (checkPointInRectangle(380, 390, 430, 440, clickX, clickY)) {
+        moveDirection = 'up';
+    } else if (checkPointInRectangle(380, 490, 430, 540, clickX, clickY)) {
+        moveDirection = 'down';
+    } else if (checkPointInRectangle(330, 440, 380, 490, clickX, clickY)) {
+        moveDirection = 'left';
+    } else if (checkPointInRectangle(430, 440, 480, 490, clickX, clickY)) {
+        moveDirection = 'right';
+    }
+
+    player.handleInput(moveDirection);
 });
