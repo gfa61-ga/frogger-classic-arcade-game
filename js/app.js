@@ -182,13 +182,13 @@ document.addEventListener('click', function(e) {
         }
     }
 
-    if (checkPointInRectangle(380, 390, 430, 440, clickX, clickY)) {
+    if (checkPointInRectangle(379, 382, 429, 440, clickX, clickY)) {
         moveDirection = 'up';
-    } else if (checkPointInRectangle(380, 490, 430, 540, clickX, clickY)) {
+    } else if (checkPointInRectangle(379, 490, 429, 548, clickX, clickY)) {
         moveDirection = 'down';
-    } else if (checkPointInRectangle(330, 440, 380, 490, clickX, clickY)) {
+    } else if (checkPointInRectangle(303, 440, 379, 490, clickX, clickY)) {
         moveDirection = 'left';
-    } else if (checkPointInRectangle(430, 440, 480, 490, clickX, clickY)) {
+    } else if (checkPointInRectangle(429, 440, 505, 490, clickX, clickY)) {
         moveDirection = 'right';
     }
 
