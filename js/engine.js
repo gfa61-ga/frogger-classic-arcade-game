@@ -164,7 +164,7 @@ var Engine = (function(global) {
      * tick. Its purpose is render the Arrow Panel
      */
     function renderArrowPanel() {
-        ctx.strokeStyle = "white";
+        ctx.strokeStyle = "#d5cabe";
         ctx.lineWidth = 8;
         ctx.beginPath();
 

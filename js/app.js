@@ -159,7 +159,7 @@ Player.prototype.reset = function(position) {
 // The scorePanel class
 let ScorePanel = function() {
     this.players = '1/3';
-    this.score = '00000';
+    this.score = '0000';
     this.timer = '1:00';
 }
 
@@ -168,7 +168,7 @@ ScorePanel.prototype.render = function() {
         ctx.font = "34px sans-serif";
         ctx.fillStyle = "white";
         ctx.fillText(this.players, 26, 100);
-        ctx.fillText(this.score, 205, 100);
+        ctx.fillText(this.score, 215, 100);
         ctx.fillText(this.timer, 419, 100);
 }
 
