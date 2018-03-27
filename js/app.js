@@ -156,7 +156,23 @@ Player.prototype.reset = function(position) {
     }
 }
 
-/* Instantiate game's objects: three enemies and one player
+// The scorePanel class
+let ScorePanel = function() {
+    this.players = '1/3';
+    this.score = '00000';
+    this.timer = '1:00';
+}
+
+// Draw the scorePanel on the screen, required method by game's Engine
+ScorePanel.prototype.render = function() {
+        ctx.font = "34px Console";
+        ctx.fillStyle = "white";
+        ctx.fillText(this.players, 30, 100);
+        ctx.fillText(this.score, 210, 100);
+        ctx.fillText(this.timer, 424, 100);
+}
+
+/* Instantiate game's objects: three enemies, one player and one scorePanel
  * Place all enemy objects in the array called allEnemies
  * Place the player object in the variable called player
  */
@@ -165,6 +181,7 @@ for (let index = 0; index < 3; index++) {
     allEnemies[index] = new Enemy();
 }
 let player = new Player();
+let scorePanel = new ScorePanel();
 
 /* Listen for key presses and send the keys to
  * Player.handleInput() method.
