@@ -11,7 +11,7 @@ let Enemy = function() {
     this.x = 525;
 
     //Set initial y position of enemy out of canvas
-    this.y = -103;
+    this.y = -121;
 
     // Enemy's velocity in CSS pixels / second
     this.velocity = 0;
@@ -31,12 +31,21 @@ Enemy.prototype.update = function(dt) {
      */
     this.x += this.velocity * dt;
 
-    /* TODO: Handle collision with the Player */
+    // If player is at the same row with this enemy
+    if (player.row === this.row) {
+        /* then check for collision
+         * Player body's horizontal position is from pixel:34 to pixel:68 of player's image
+         * Enemy body's horizontal position is from pixel 1 to 101 pixel of enemy's image
+         */
+        if (!(player.x + 34 > this.x + 101 || player.x + 68 < this.x + 1)) {
+            player.reset('beatenByEneny');
+        }
+    }
 
     // If the enemy disappears, moving completely out of the right side of the canvas,
     if (this.x >=  525) {
         // move the enemy completely out of the left side of the canvas
-        this.x = -101;
+        this.x = -121;
 
         // and set a new random row
         this.row = this.randomInt(1, 3);
@@ -67,10 +76,14 @@ let Player = function() {
     // The image/sprite for our player
     this.sprite = 'images/char-boy.png';
 
-    // The row where the player starts. In game can take an integer value between 1 and 5
+    /* The initial row where the player stays.
+     *In game can take an integer value between 1 and 5
+     */
     this.row = 5;
 
-    // The column where the player stays. In game can take an integer value between 1 and 5
+    /* The initial column where the player stays.
+     * In game can take an integer value between 1 and 5
+    */
     this.column = 3;
 
     // Set initial x position of the player
@@ -116,8 +129,12 @@ Player.prototype.handleInput = function(moveDirection) {
          * check that row number is a value between 1 and 5
          */
         case 'up':
-            if (this.row > 1) {
+            if (this.row > 0) {
                 this.row--;
+            }
+            // Once the player reaches row 0 (the water) the round is won
+            if (this.row === 0) {
+                player.reset('win');
             }
             break;
         case 'down':
@@ -126,6 +143,18 @@ Player.prototype.handleInput = function(moveDirection) {
             }
     }
 };
+
+/* Reset player position, method needed by Player.handleInput() and Enemy.update() methods
+ * Parameter: position, can take a String value between 'beatenByEneny' and 'win'
+ */
+Player.prototype.reset = function(position) {
+    player.row = 5;
+    if (position === 'beatenByEneny') {
+        player.column = 4;
+    } else if (position === 'win') {
+        player.column = 3;
+    }
+}
 
 /* Instantiate game's objects: three enemies and one player
  * Place all enemy objects in the array called allEnemies
