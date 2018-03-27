@@ -165,11 +165,11 @@ let ScorePanel = function() {
 
 // Draw the scorePanel on the screen, required method by game's Engine
 ScorePanel.prototype.render = function() {
-        ctx.font = "34px Console";
+        ctx.font = "34px sans-serif";
         ctx.fillStyle = "white";
-        ctx.fillText(this.players, 30, 100);
-        ctx.fillText(this.score, 210, 100);
-        ctx.fillText(this.timer, 424, 100);
+        ctx.fillText(this.players, 26, 100);
+        ctx.fillText(this.score, 205, 100);
+        ctx.fillText(this.timer, 419, 100);
 }
 
 /* Instantiate game's objects: three enemies, one player and one scorePanel
