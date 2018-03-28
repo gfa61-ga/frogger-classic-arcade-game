@@ -20,7 +20,8 @@ let Enemy = function() {
     this.row = 0;
 };
 
-/* Update the enemy's position and check for collisions, required method by game's Engine
+/* Update the enemy's position and check for collisions with the player
+ * and updates scorePanel, required method by game's Engine
  * Parameter: dt, the time delta between two successive game's frames, which is
  * calculated by the game's Engine
  */
@@ -51,7 +52,19 @@ Enemy.prototype.update = function(dt) {
          * Enemy body's horizontal position is from pixel 1 to 101 pixel of enemy's image
          */
         if (!(player.x + 34 > this.x + 101 || player.x + 68 < this.x + 1)) {
-            player.reset('beatenByEneny');
+            // After collision the player is lost
+            scorePanel.players--;
+
+            // If there are more players, play again
+            if (scorePanel.players > 0) {
+                player.reset('beatenByEneny');
+            } else {
+                // else end the game
+                scorePanel.banner = 'Game Over';
+                scorePanel.bannerTextColor = '#c20000';
+                scorePanel.gameOver();
+                player.reset('initialPosition');
+            }
         }
     }
 };
@@ -92,9 +105,14 @@ let Player = function() {
 
     // Set initial y position of the player
     this.y = 53 + (this.row - 1) * 83;
+
+    /* canMove is set to false for 3 seconds
+     * while the 'Game Over' message is displayed
+     */
+    this.canMove = true;
 };
 
-/* Update the player's position and check for rock collection,
+/* Update the player's position, check for rock collection and update scorePanel,
  * required method by game's Engine
  */
 Player.prototype.update = function() {
@@ -103,6 +121,11 @@ Player.prototype.update = function() {
 
     // Check if the player collects a rock
     if (rock.row === this.row && rock.column === this.column) {
+
+        /* Score increase, for rock in column: 1, 2, 3, 4, 5
+         * equals to: 100, 80, 60, 40, 20 respectively
+         */
+        scorePanel.score += 20 * (6 - rock.column);
         rock.reset();
     }
 };
@@ -114,77 +137,115 @@ Player.prototype.render = function() {
 };
 
 /* Handle user input to properly move the player
+ * and update the scorePanel when the player reaches to the water,
+ * method used by document's keyboard-listener and click-listener
  * Parameter: moveDirection, takes a String value
  * between 'left', 'right', 'up' and 'down'
  */
 Player.prototype.handleInput = function(moveDirection) {
-    switch(moveDirection) {
-        /* When moving left - right
-         * check that column number is a value between 1 and 5
-         */
-        case 'left':
-            if (this.column > 1) {
-                this.column--;
-            }
-            break;
-        case 'right':
-            if (this.column < 5) {
-                this.column++;
-            }
-            break;
+    // IF the 'Game Over' message is not displayed
+    if (this.canMove) {
+        switch(moveDirection) {
+            /* When moving left - right
+             * check that column number is a value between 1 and 5
+             */
+            case 'left':
+                if (this.column > 1) {
+                    this.column--;
+                }
+                break;
+            case 'right':
+                if (this.column < 5) {
+                    this.column++;
+                }
+                break;
 
-        /* When moving up - down
-         * check that row number is a value between 1 and 5
-         */
-        case 'up':
-            if (this.row > 0) {
-                this.row--;
-            }
-            // Once the player reaches row 0 (the water) the round is won
-            if (this.row === 0) {
-                player.reset('win');
-            }
-            break;
-        case 'down':
-            if (this.row < 5) {
-                this.row++;
-            }
+            /* When moving up - down
+             * check that row number is a value between 1 and 5
+             */
+            case 'up':
+                if (this.row > 0) {
+                    this.row--;
+                }
+                // Once the player reaches row 0 (the water) the round is won
+                if (this.row === 0) {
+                    // Score increase equals to: 60
+                    scorePanel.score += 60;
+                    this.reset('initialPosition');
+                }
+                break;
+            case 'down':
+                if (this.row < 5) {
+                    this.row++;
+                }
+        }
     }
 };
 
 /* Reset player position, required method by Player.handleInput() and Enemy.update() methods
- * Parameter: position, can take a String value between 'beatenByEneny' and 'win'
+ * Parameter: position, can take a String value between 'beatenByEneny' and 'initialPosition'
  */
 Player.prototype.reset = function(position) {
-    player.row = 5;
+    this.row = 5;
     if (position === 'beatenByEneny') {
-        player.column = 4;
-    } else if (position === 'win') {
-        player.column = 3;
+        this.column = 4;
+    } else if (position === 'initialPosition') {
+        this.column = 3;
     }
 }
 
 // The scorePanel class
 let ScorePanel = function() {
-    this.players = '1/3';
-    this.score = '0000';
+    this.players = 3;
+    this.score = 0;
     this.timer = '1:00';
+    this.banner = '';
+    this.bannerTextColor = '';
     this.topScore = '9999';
 }
 
 // Draw the scorePanel on the screen, required method by game's Engine
 ScorePanel.prototype.render = function() {
         ctx.font = '34px sans-serif';
-        ctx.fillStyle = '#b4dae8';
-        ctx.fillText(this.players, 26, 100);
-        ctx.fillText(this.score, 213, 100);
+        ctx.fillStyle = '#eaf6f6';
+        ctx.fillText(this.players + '/3', 26, 100);
+
+        // Display score with 4 digits
+        const zerosBeforeScore = this.score < 9 ? '000'
+                                : this.score < 99 ? '00'
+                                : this.score < 999 ? '0'
+                                : '';
+        ctx.fillText(zerosBeforeScore + this.score, 213, 100);
         ctx.fillText(this.timer, 419, 100);
 
-        ctx.fillStyle = '#dd6bc9';
+        ctx.font = '48px sans-serif';
+        ctx.fillStyle = this.bannerTextColor;
+        ctx.fillText(this.banner, 130, 270);
+
+        ctx.fillStyle = '#3c0c34';
         ctx.font = '26px sans-serif';
         ctx.fillText('Top score:   ', 26, 575);
         ctx.font = '32px sans-serif';
         ctx.fillText(this.topScore, 216, 575);
+}
+
+/* Disable player movement for 3 seconds and then restart the game,
+ * method required by Enemy.update() method
+ */
+ScorePanel.prototype.gameOver = function() {
+    player.canMove = false;
+
+    // starts new game
+    const startNewGame = function() {
+        this.banner = '';
+        this.bannerTextColor = '';
+        this.score = 0;
+        this.players = 3;
+        player.canMove = true;
+    }
+
+    // Start new game after 3 seconds
+    setTimeout(startNewGame.bind(this), 3000);
 }
 
 // The rock class
@@ -249,8 +310,8 @@ let rock = new Rock();
 // to be called when the timer starts            /* TODO */
 rock.update();
 
-/* Listen for key presses and send the keys to
- * Player.handleInput() method.
+/* Listen for arrow-key presses and send the keys to
+ * player.handleInput() method.
  */
 document.addEventListener('keyup', function(e) {
     let allowedKeys = {
