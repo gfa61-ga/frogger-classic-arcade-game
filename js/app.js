@@ -202,7 +202,7 @@ Player.prototype.reset = function(position) {
     }
 }
 
-// The scorePanel class
+// The scorePanel class. Initiates topScore from localstore, if available
 let ScorePanel = function() {
     this.players = 3;
     this.score = 0;
@@ -211,43 +211,71 @@ let ScorePanel = function() {
     this.timerWorkingStatus = false;
     this.banner = '';
     this.bannerTextColor = '';
-    this.topScore = '9999';
+
+    // Return true if localStorage is available
+    this.storageAvailable = function() {
+        try {
+            localStorage.setItem('test', '__storage_test__');
+            localStorage.removeItem('test');
+            return true;
+        } catch(e) {
+            return false;
+        }
+    };
+
+    // If localStorage is available
+    if (this.storageAvailable()) {
+        // and If localStorage is not empty
+        if(localStorage.getItem('topScore') != null) {
+            // Restore topScore
+            this.topScore = parseInt(localStorage.getItem('topScore'));
+        } else {
+            this.topScore = 0;
+        }
+    }
 }
 
 // Draw the scorePanel on the screen, required method by game's Engine
 ScorePanel.prototype.render = function() {
-        // Display number of players left alive
-        ctx.font = '34px sans-serif';
-        ctx.fillStyle = '#eaf6f6';
-        ctx.fillText(this.players + '/3', 26, 100);
-
-        // Display score with 4 digits
-        const zerosBeforeScore = this.score < 9 ? '000'
-                                : this.score < 99 ? '00'
-                                : this.score < 999 ? '0'
+    /* Return score with 4 digit format,
+     * Parameter: score, allowed value: an integer < 9999
+     */
+    const storeTo4Digits = function(score) {
+        const zerosBeforeScore = score < 9 ? '000'
+                                : score < 99 ? '00'
+                                : score < 999 ? '0'
                                 : '';
-        ctx.fillText(zerosBeforeScore + this.score, 213, 100);
+        return zerosBeforeScore + score;
+    }
 
-        // Display timeLeft in m:ss format
-        const timeLeftToString = this.timeLeft === 60 ? '1:00'
-                                : this.timeLeft > 9 ? '0:' + this.timeLeft
-                                : '0:0' + this.timeLeft;
-        ctx.fillText(timeLeftToString, 419, 100);
+    // Display number of players left alive
+    ctx.font = '34px sans-serif';
+    ctx.fillStyle = '#eaf6f6';
+    ctx.fillText(this.players + '/3', 26, 100);
 
-        // Display banner
-        ctx.font = '48px sans-serif';
-        ctx.fillStyle = this.bannerTextColor;
-        ctx.fillText(this.banner, 130, 270);
+    // Display score with 4 digits
+    ctx.fillText(storeTo4Digits(this.score), 213, 100);
 
-        // Display top score
-        ctx.fillStyle = '#3c0c34';
-        ctx.font = '26px sans-serif';
-        ctx.fillText('Top score:   ', 26, 575);
-        ctx.font = '32px sans-serif';
-        ctx.fillText(this.topScore, 216, 575);
+    // Display timeLeft in m:ss format
+    const timeLeftToString = this.timeLeft === 60 ? '1:00'
+                            : this.timeLeft > 9 ? '0:' + this.timeLeft
+                            : '0:0' + this.timeLeft;
+    ctx.fillText(timeLeftToString, 419, 100);
+
+    // Display banner
+    ctx.font = '48px sans-serif';
+    ctx.fillStyle = this.bannerTextColor;
+    ctx.fillText(this.banner, 130, 270);
+
+    // Display top score with 4 digits
+    ctx.fillStyle = '#3c0c34';
+    ctx.font = '26px sans-serif';
+    ctx.fillText('Top score:   ', 26, 575);
+    ctx.font = '32px sans-serif';
+    ctx.fillText(storeTo4Digits(this.topScore), 216, 575);
 }
 
-/* Stop the timer,
+/* Stop the timer, update top score and save it to localStorage if it's available,
  * display 'Game Over' message and disable player's movement for 3 seconds,
  * and then restart the game,
  * method required by Enemy.update() and scorePanel.startTimer() methods
@@ -255,6 +283,15 @@ ScorePanel.prototype.render = function() {
 ScorePanel.prototype.gameOver = function() {
     clearInterval(this.gameTimer);
     this.timerWorkingStatus = false;
+
+    if (this.topScore < this.score) {
+        this.topScore = this.score;
+    }
+
+    // Save topScore in localStorage, if it's available
+    if (this.storageAvailable()) {
+        localStorage.setItem('topScore', this.topScore);
+    }
 
     this.bannerTextColor = '#c20000';
     this.banner = 'Game Over';
