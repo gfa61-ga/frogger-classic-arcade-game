@@ -145,9 +145,11 @@ var Engine = (function(global) {
 
     /* This function is called by the render function and is called on each game
      * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
+     * on your enemy, player and rock entities within app.js
      */
     function renderEntities() {
+        rock.render();
+
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
@@ -161,46 +163,56 @@ var Engine = (function(global) {
     }
 
     /* This function is called by the render function and is called on each game
-     * tick. Its purpose is render the Arrow Panel
+     * tick. Its purpose is to render the Arrow Panel
      */
     function renderArrowPanel() {
-        ctx.strokeStyle = "#d5cabe";
+        ctx.strokeStyle = "#dd6bc9";
         ctx.lineWidth = 8;
-        ctx.beginPath();
 
-        // Up arrow
-        ctx.moveTo(404,440);
-        ctx.lineTo(404,382);
-        ctx.moveTo(404,382);
-        ctx.lineTo(419,397);
-        ctx.lineTo(404,382);
-        ctx.lineTo(389,397);
+        // When i === 1, draw arrows pink border
+        for (let i = 1; i <= 2; i++) {
+            // When i === 2, draw arrows green fill
+            if (i === 2) {
+                ctx.strokeStyle = "#5fc148";
+                ctx.lineWidth = 5;
+            }
 
-        // Down arrow
-        ctx.moveTo(404,490);
-        ctx.lineTo(404,548);
-        ctx.moveTo(404,548);
-        ctx.lineTo(419,533);
-        ctx.lineTo(404,548);
-        ctx.lineTo(389,533);
+            ctx.beginPath();
 
-        // Left arrow
-        ctx.moveTo(379,465);
-        ctx.lineTo(303,465);
-        ctx.moveTo(303,465);
-        ctx.lineTo(318,480);
-        ctx.lineTo(303,465);
-        ctx.lineTo(318,450);
+            // Up arrow
+            ctx.moveTo(404,440);
+            ctx.lineTo(404,382);
+            ctx.moveTo(404,382);
+            ctx.lineTo(419,397);
+            ctx.lineTo(404,382);
+            ctx.lineTo(389,397);
 
-        // Right arrow
-        ctx.moveTo(429,465);
-        ctx.lineTo(505,465);
-        ctx.moveTo(505,465);
-        ctx.lineTo(490,480);
-        ctx.lineTo(505,465);
-        ctx.lineTo(490,450);
+            // Down arrow
+            ctx.moveTo(404,490);
+            ctx.lineTo(404,548);
+            ctx.moveTo(404,548);
+            ctx.lineTo(419,533);
+            ctx.lineTo(404,548);
+            ctx.lineTo(389,533);
 
-        ctx.stroke();
+            // Left arrow
+            ctx.moveTo(379,465);
+            ctx.lineTo(303,465);
+            ctx.moveTo(303,465);
+            ctx.lineTo(318,480);
+            ctx.lineTo(303,465);
+            ctx.lineTo(318,450);
+
+            // Right arrow
+            ctx.moveTo(429,465);
+            ctx.lineTo(505,465);
+            ctx.moveTo(505,465);
+            ctx.lineTo(490,480);
+            ctx.lineTo(505,465);
+            ctx.lineTo(490,450);
+
+            ctx.stroke();
+        }
     }
 
     /* This function does nothing but it could have been a good place to
@@ -220,7 +232,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-pink-girl.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 
