@@ -20,8 +20,9 @@ let Enemy = function() {
     this.row = 0;
 };
 
-/* Update the enemy's position and check for collisions with the player
- * and updates scorePanel, required method by game's Engine
+/* Update the enemy's position, check for collisions with the player
+ * and if true call the scorePanel.endGam() method,
+ * required method by game's Engine
  * Parameter: dt, the time delta between two successive game's frames, which is
  * calculated by the game's Engine
  */
@@ -60,8 +61,6 @@ Enemy.prototype.update = function(dt) {
                 player.reset('beatenByEneny');
             } else {
                 // else end the game
-                scorePanel.banner = 'Game Over';
-                scorePanel.bannerTextColor = '#c20000';
                 scorePanel.gameOver();
                 player.reset('initialPosition');
             }
@@ -127,6 +126,7 @@ Player.prototype.update = function() {
          */
         scorePanel.score += 20 * (6 - rock.column);
         rock.reset();
+        rock.update();
     }
 };
 
@@ -145,6 +145,13 @@ Player.prototype.render = function() {
 Player.prototype.handleInput = function(moveDirection) {
     // IF the 'Game Over' message is not displayed
     if (this.canMove) {
+        // If this is the first game's move, start the timer and set a random-rock-update
+        if (scorePanel.timerWorkingStatus === false) {
+            scorePanel.timerWorkingStatus = true;
+            scorePanel.startTimer();
+            rock.update();
+        }
+
         switch(moveDirection) {
             /* When moving left - right
              * check that column number is a value between 1 and 5
@@ -182,7 +189,8 @@ Player.prototype.handleInput = function(moveDirection) {
     }
 };
 
-/* Reset player position, required method by Player.handleInput() and Enemy.update() methods
+/* Reset player position, required method by Player.handleInput(),
+ * Enemy.update() and scorePanel.startNewGame() methods
  * Parameter: position, can take a String value between 'beatenByEneny' and 'initialPosition'
  */
 Player.prototype.reset = function(position) {
@@ -198,7 +206,9 @@ Player.prototype.reset = function(position) {
 let ScorePanel = function() {
     this.players = 3;
     this.score = 0;
-    this.timer = '1:00';
+    this.timeLeft = 60; // seconds
+    this.gameTimer = {};
+    this.timerWorkingStatus = false;
     this.banner = '';
     this.bannerTextColor = '';
     this.topScore = '9999';
@@ -206,6 +216,7 @@ let ScorePanel = function() {
 
 // Draw the scorePanel on the screen, required method by game's Engine
 ScorePanel.prototype.render = function() {
+        // Display number of players left alive
         ctx.font = '34px sans-serif';
         ctx.fillStyle = '#eaf6f6';
         ctx.fillText(this.players + '/3', 26, 100);
@@ -216,12 +227,19 @@ ScorePanel.prototype.render = function() {
                                 : this.score < 999 ? '0'
                                 : '';
         ctx.fillText(zerosBeforeScore + this.score, 213, 100);
-        ctx.fillText(this.timer, 419, 100);
 
+        // Display timeLeft in m:ss format
+        const timeLeftToString = this.timeLeft === 60 ? '1:00'
+                                : this.timeLeft > 9 ? '0:' + this.timeLeft
+                                : '0:0' + this.timeLeft;
+        ctx.fillText(timeLeftToString, 419, 100);
+
+        // Display banner
         ctx.font = '48px sans-serif';
         ctx.fillStyle = this.bannerTextColor;
         ctx.fillText(this.banner, 130, 270);
 
+        // Display top score
         ctx.fillStyle = '#3c0c34';
         ctx.font = '26px sans-serif';
         ctx.fillText('Top score:   ', 26, 575);
@@ -229,23 +247,54 @@ ScorePanel.prototype.render = function() {
         ctx.fillText(this.topScore, 216, 575);
 }
 
-/* Disable player movement for 3 seconds and then restart the game,
- * method required by Enemy.update() method
+/* Stop the timer,
+ * display 'Game Over' message and disable player's movement for 3 seconds,
+ * and then restart the game,
+ * method required by Enemy.update() and scorePanel.startTimer() methods
  */
 ScorePanel.prototype.gameOver = function() {
+    clearInterval(this.gameTimer);
+    this.timerWorkingStatus = false;
+
+    this.bannerTextColor = '#c20000';
+    this.banner = 'Game Over';
+
     player.canMove = false;
 
-    // starts new game
+    // Reset scorePanel, player and rock for a new game
     const startNewGame = function() {
         this.banner = '';
         this.bannerTextColor = '';
         this.score = 0;
         this.players = 3;
+        this.timeLeft = 60; // seconds
+
+        player.reset('initialPosition');
         player.canMove = true;
+
+        rock.reset();
     }
 
     // Start new game after 3 seconds
     setTimeout(startNewGame.bind(this), 3000);
+}
+
+/* Count down scopePanel's 'timer' property, initially set to 60 seconds
+ * and then end the game,
+ * method required by player.handleInput() method
+ */
+ScorePanel.prototype.startTimer = function() {
+    // Count down to zero
+    const countDown = function() {
+        this.timeLeft--;
+        if (this.timeLeft === 0) {
+        // Stop the game
+        this.gameOver();
+        }
+    };
+
+    // start the timer
+    this.gameTimer = setInterval(countDown.bind(this), 1000);
 }
 
 // The rock class
@@ -262,7 +311,7 @@ let Rock = function() {
 }
 
 /* Randomly update rock's position, after random seconds
- * method required by Rock.reset() method and to initiate the first rock instance
+ * method required by player.update() and player.handleInput() methods
  */
 Rock.prototype.update = function() {
     // Locate rock in a random position
@@ -284,18 +333,16 @@ Rock.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
-// Reset the rock, required method by Player.update() method
+// Reset the rock, required method by player.update() and scorePanel.gameOver() method
 Rock.prototype.reset = function() {
     this.row = 0;
     this.column = 0;
     this.x = -103;
     this.y = -103;
-
-    // update rock's random position
-    this.update();
 }
 
-/* Instantiate game's objects: three enemies, one player, one scorePanel and one rock
+/* Instantiate game's global objects: three enemies, one player,
+ * one scorePanel and one rock
  * Place all enemy objects in the array called allEnemies
  * Place the player object in the variable called player
  */
@@ -307,8 +354,6 @@ let player = new Player();
 let scorePanel = new ScorePanel();
 
 let rock = new Rock();
-// to be called when the timer starts            /* TODO */
-rock.update();
 
 /* Listen for arrow-key presses and send the keys to
  * player.handleInput() method.
@@ -321,7 +366,10 @@ document.addEventListener('keyup', function(e) {
         40: 'down'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    // If an allowedKey is pressed
+    if (allowedKeys[e.keyCode] != undefined) {
+        player.handleInput(allowedKeys[e.keyCode]);
+    }
 });
 
 /* Listen for ArrowPanel clicks and send moveDirection to
@@ -341,7 +389,7 @@ document.addEventListener('click', function(e) {
     //Fix X offset of click location
     const clickY = Math.round(e.offsetY * heightFix);
 
-    let moveDirection;
+    let moveDirection = '';
 
     /* Check if click point is inside a rectangle area
      * Parameters: xs, ys, coordinates of rectangle's upper left corner
@@ -356,6 +404,7 @@ document.addEventListener('click', function(e) {
         }
     }
 
+    // Set clickable area for each arrow
     if (checkPointInRectangle(379, 382, 429, 440, clickX, clickY)) {
         moveDirection = 'up';
     } else if (checkPointInRectangle(379, 490, 429, 548, clickX, clickY)) {
@@ -366,5 +415,8 @@ document.addEventListener('click', function(e) {
         moveDirection = 'right';
     }
 
-    player.handleInput(moveDirection);
+    // if an arrow area was clicked
+    if (moveDirection != '') {
+        player.handleInput(moveDirection);
+    }
 });
