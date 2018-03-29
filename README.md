@@ -21,7 +21,7 @@ You can move your players:
 * Once the player **reaches the water** he gets 60 points and **returns to its initial position**.
 
 ### Game Over
-The game is **over** and** reset**:
+The game is **over** and **reset**:
 1. when there is **no player left** or
 2. when the **1 minute has passed**.
 
