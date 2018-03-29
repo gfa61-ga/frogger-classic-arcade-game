@@ -1,6 +1,36 @@
-frontend-nanodegree-arcade-game
-===============================
+# Frogger: classic arcade game
 
-Students should use this [rubric](https://review.udacity.com/#!/projects/2696458597/rubric) for self-checking their submission. Make sure the functions you write are **object-oriented** - either class functions (like Player and Enemy) or class prototype functions such as Enemy.prototype.checkCollisions, and that the keyword 'this' is used appropriately within your class and class prototype functions to refer to the object the function is called upon. Also be sure that the **readme.md** file is updated with your instructions on both how to 1. Run and 2. Play your arcade game.
+In this [game](https://gfa61-ga.github.io/frogger-classic-arcade-game/) you have Players and Enemies (Bugs). The game has 3 players. The goal of each player is to reach the water, without colliding into any one of the enemies. The player can move left, right, up and down. The enemies move in varying speeds on the paved block portion of the scene.
+## Table of Contents
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+* [Instructions](#instructions)
+* [Additional functionality](#Additional-functionality)
+* [Dependencies](#Dependencies)
+
+## Instructions
+
+You can move your players:
+1. by using the keyboard arrow keys or
+2. by clicking or taping on the arrowPanel, at the lower right side of the gameBoard.
+
+### Player move rules
+
+* All 3 players **have 1 minute** available to play the game.
+* Once a player **collides** with an enemy, the player **loses his life** and the **next player** starts from the looser position.
+* Once the player **collects a rock** he **gets** some **point**s, according to the rock position.
+* Once the player **reaches the water** he gets 60 points and **returns to its initial position**.
+
+### Game Over
+The game is **over** and** reset**:
+1. when there is **no player left** or
+2. when the **1 minute has passed**.
+
+### Goal of the game
+The goal of every game is to **get a higher score** than the latest top score.
+
+## Additional-functionality
+If your browser supports **localStorage**, your Top Score is kept as long as you don't clean your browser's memory from cooKies.
+
+## Dependencies
+
+This game is based on the starter code of [this](https://github.com/udacity/frontend-nanodegree-arcade-game) Udacity repository for the Front End Develpmpent students.
