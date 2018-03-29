@@ -159,7 +159,7 @@ var Engine = (function(global) {
 
         player.render();
 
-        scorePanel.render();
+        gamePanel.render();
     }
 
     /* This function is called by the render function and is called on each game
