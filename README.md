@@ -1,11 +1,13 @@
 # Frogger: classic arcade game
 
 In this [game](https://gfa61-ga.github.io/frogger-classic-arcade-game/) you have Players and Enemies (Bugs). The game has 3 players. The goal of each player is to reach the water, without colliding into any one of the enemies. The player can move left, right, up and down. The enemies move in varying speeds on the paved block portion of the scene.
-## Table of Contents
 
-* [Instructions](#instructions)
-* [Additional functionality](#Additional-functionality)
-* [Dependencies](#Dependencies)
+## Installation and Run
+Clone the GitHub repository and open the index.html file in any browser to **run** the game.
+
+* git clone https://github.com/gfa61-ga/frogger-classic-arcade-game.git
+* cd frogger-classic-arcade-game
+* start index.html
 
 ## Instructions
 
@@ -33,4 +35,7 @@ If your browser supports **localStorage**, your Top Score is kept as long as you
 
 ## Dependencies
 
-This game is based on the starter code of [this](https://github.com/udacity/frontend-nanodegree-arcade-game) Udacity repository for the Front End Develpmpent students.
+Game's code is in vanilla javascript and is based on the starter code of [this](https://github.com/udacity/frontend-nanodegree-arcade-game) Udacity repository for the Front End Develpmpent students.
+
+## License
+This code is distributed under the [MIT license](https://opensource.org/licenses/MIT).
