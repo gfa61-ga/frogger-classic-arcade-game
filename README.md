@@ -35,7 +35,9 @@ If your browser supports **localStorage**, your Top Score is kept as long as you
 
 ## Dependencies
 
-Game's code is in vanilla javascript and is based on the starter code of [this](https://github.com/udacity/frontend-nanodegree-arcade-game) Udacity repository for the Front End Develpmpent students.
+Game's code is in vanilla javascript and is based on:
+* the starter code of [this](https://github.com/udacity/frontend-nanodegree-arcade-game) Udacity repository for the Front End Develpmpent students
+* [howler.js](https://github.com/goldfire/howler.js) audio library.
 
 ## License
 This code is distributed under the [MIT license](https://opensource.org/licenses/MIT).

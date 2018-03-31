@@ -58,6 +58,7 @@ Enemy.prototype.update = function(dt) {
             if (!(player.x + 34 > this.x + 101 || player.x + 68 < this.x + 1)) {
                 // After collision the player is lost
                 gamePanel.players--;
+                gamePanel.sounds['squash'].play();
 
                 // If there are more players, play again
                 if (gamePanel.players > 0) {
@@ -86,7 +87,7 @@ Enemy.prototype.render = function() {
  */
 Enemy.prototype.randomInt = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
-}
+};
 
 // The player class
 let Player = function() {
@@ -120,6 +121,7 @@ Player.prototype.update = function() {
     // Check if the player collects a rock
     if (rock.row === this.row && rock.column === this.column) {
         gamePanel.score += rock.calculateScore();
+        gamePanel.sounds['rock-in'].play();
         rock.reset();
         rock.update();
     }
@@ -173,6 +175,7 @@ Player.prototype.handleInput = function(moveDirection) {
                 if (this.row === 0) {
                     // Score increase equals to: 60
                     gamePanel.score += 60;
+                    gamePanel.sounds['plunk'].play();
                     this.reset('initialPosition');
                 }
                 break;
@@ -195,7 +198,7 @@ Player.prototype.reset = function(position) {
     } else if (position === 'initialPosition') {
         this.column = 3;
     }
-}
+};
 
 // The gamePanel class. Initiates topScore from localstore, if available
 let GamePanel = function() {
@@ -208,6 +211,26 @@ let GamePanel = function() {
 
     this.banner = '';
     this.bannerTextColor = '';
+
+    // Load game sounds
+    this.sounds = {
+        'rock-in': new Howl({
+            src: ['sounds/rock-in.wav']
+        }),
+        'plunk' : new Howl({
+            src: ['sounds/plunk.wav']
+        }),
+        'squash' : new Howl({
+            src: ['sounds/squash.wav']
+        }),
+        'time-over' : new Howl({
+            src: ['sounds/time-over.wav']
+        }),
+        /* TODO */
+        'hop' : new Howl({
+            src: ['sounds/hop.wav']
+        })
+    };
 
 
     /* pauseGame will be set to true for 5 seconds,
@@ -232,14 +255,14 @@ let GamePanel = function() {
     // If localStorage is available
     if (this.storageAvailable()) {
         // and If localStorage is not empty
-        if(localStorage.getItem('topScore') != null) {
+        if(localStorage.getItem('topScore') !== null) {
             // Restore topScore
             this.topScore = parseInt(localStorage.getItem('topScore'));
         } else {
             this.topScore = 0;
         }
     }
-}
+};
 
 // Draw the gamePanel on the screen, required method by game's Engine
 GamePanel.prototype.render = function() {
@@ -252,7 +275,7 @@ GamePanel.prototype.render = function() {
                                 : score < 999 ? '0'
                                 : '';
         return zerosBeforeScore + score;
-    }
+    };
 
     // Display number of players left alive
     ctx.font = '34px sans-serif';
@@ -279,7 +302,7 @@ GamePanel.prototype.render = function() {
     ctx.fillText('Top score:   ', 55, 575);
     ctx.font = '32px sans-serif';
     ctx.fillText(storeTo4Digits(this.topScore), 216, 575);
-}
+};
 
 /* Stop the timer, update top score and save it to localStorage if it's available,
  * display 'Game Over' message and pause game for 5 seconds,
@@ -326,11 +349,11 @@ GamePanel.prototype.gameOver = function() {
         rock.reset();
 
         gamePanel.pauseGame = false;
-    }
+    };
 
     // Start the new game after 5 seconds
     setTimeout(startNewGame.bind(this), 5000);
-}
+};
 
 /* Count down scopePanel's 'timer' property, initially set to 60 seconds
  * and then end the game,
@@ -340,6 +363,9 @@ GamePanel.prototype.startTimer = function() {
     // Count down to zero
     const countDown = function() {
         this.timeLeft--;
+        if (this.timeLeft < 5 && this.timeLeft > 0) {
+            this.sounds['time-over'].play();
+        }
         if (this.timeLeft === 0) {
         // Stop the game
         this.gameOver();
@@ -348,7 +374,7 @@ GamePanel.prototype.startTimer = function() {
 
     // start the timer
     this.gameTimer = setInterval(countDown.bind(this), 1000);
-}
+};
 
 // The rock class
 let Rock = function() {
@@ -368,8 +394,8 @@ let Rock = function() {
          * equals to: 100, 80, 60, 40, 20 respectively
          */
         return 20 * (6 - this.column);
-    }
-}
+    };
+};
 
 /* Randomly update rock's position, after random seconds
  * method required by player.update() and player.handleInput() methods
@@ -386,7 +412,7 @@ Rock.prototype.update = function() {
     // Locate the rock after random rockEmergeSeconds
     const rockEmergeSeconds = Enemy.prototype.randomInt(4, 10);
     gamePanel.emergeRock = setTimeout(randomlyLocateRock.bind(this), rockEmergeSeconds * 1000);
-}
+};
 
 // Draw the rock on the screen, required method by game's Engine
 Rock.prototype.render = function() {
@@ -397,7 +423,7 @@ Rock.prototype.render = function() {
     ctx.font = '34px sans-serif';
     ctx.fillStyle = '#614F14';
     ctx.fillText(this.calculateScore(), this.x + (this.calculateScore() < 100 ? 30 : 20), this.y + 120);
-}
+};
 
 // Reset the rock, required method by player.update() and gamePanel.gameOver() method
 Rock.prototype.reset = function() {
@@ -405,7 +431,7 @@ Rock.prototype.reset = function() {
     this.column = 0;
     this.x = -103;
     this.y = -103;
-}
+};
 
 /* Instantiate game's global objects: three enemies, one player,
  * one gamePanel and one rock
@@ -433,7 +459,7 @@ document.addEventListener('keyup', function(e) {
     };
 
     // If an allowedKey is pressed
-    if (allowedKeys[e.keyCode] != undefined) {
+    if (allowedKeys[e.keyCode] !== undefined) {
         player.handleInput(allowedKeys[e.keyCode]);
     }
 });
@@ -482,7 +508,7 @@ document.addEventListener('click', function(e) {
     }
 
     // if an arrow area was clicked
-    if (moveDirection != '') {
+    if (moveDirection !== '') {
         player.handleInput(moveDirection);
     }
 });
