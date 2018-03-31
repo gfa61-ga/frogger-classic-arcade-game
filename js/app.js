@@ -45,8 +45,8 @@ Enemy.prototype.update = function(dt) {
             this.row = this.randomInt(1, 3);
             this.y = -20 + 83 * this.row;
 
-            // and a new random velocity for this enemy, between 125 px/sec and 475 px/sec
-            this.velocity = this.randomInt(125, 475);
+            // and a new random velocity for this enemy, between 125 px/sec and 375 px/sec
+            this.velocity = this.randomInt(125, 375);
         }
 
         // If player is at the same row with this enemy
